@@ -1,5 +1,10 @@
 # kickstart.nvim
 
+## My Notes
+
+    brew install git gh nvim ripgrep fd fzf
+    gh repo clone tuncay/kickstart.nvim ~/.config/nvim
+
 ## Introduction
 
 A starting point for Neovim that is:
