@@ -2,7 +2,7 @@ local MiniFiles = require 'mini.files'
 MiniFiles.setup()
 vim.keymap.set('n', '-', function()
   MiniFiles.open(vim.api.nvim_buf_get_name(0), false)
-end, { desc = '[f]ile [d]irectory' })
+end, { desc = '[f]iles [d]irectory explorer' })
 vim.keymap.set('n', '_', MiniFiles.open, { desc = 'edit current cwd' })
 local map_split = function(buf_id, lhs, direction)
   local rhs = function()
