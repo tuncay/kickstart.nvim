@@ -7,6 +7,7 @@ local builtin = require 'telescope.builtin'
 
 local project_dirs = {
   vim.fn.expand '~/works/',
+  vim.fn.expand '~/works/dummy/',
   vim.fn.expand '~/notes/',
 }
 
