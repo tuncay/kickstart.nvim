@@ -2,7 +2,8 @@
 
 ## My Notes
 
-    brew install git gh nvim ripgrep fd fzf
+    brew install git gh nvim ripgrep fd fzf node rustup dotnet lazygit
+    rustup default stable
     gh repo clone tuncay/kickstart.nvim ~/.config/nvim
 
 ## Introduction

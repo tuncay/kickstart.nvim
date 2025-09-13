@@ -676,8 +676,69 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
+        pyright = {},
+        ruff = {},
+        rust_analyzer = {
+          ['rust-analyzer'] = {
+            diagnostics = { enable = true },
+            check = { command = 'check' }, -- can be clippy too
+            cargo = { features = 'all' },
+            checkOnSave = {
+              assist = {
+                importGranularity = 'module',
+                importPrefix = 'by_self',
+              },
+              cargo = { loadOutDirsFromCheck = true },
+              procMacro = { enable = true },
+              command = 'clippy',
+              inlayHints = true,
+            },
+            inlayHints = {
+              enabled = true,
+              chainingHints = { enable = false }, -- do not enable
+              closingBraceHints = { enable = false },
+              bindingModeHints = { enable = true },
+              closureCaptureHints = { enable = true },
+              closureReturnTypeHints = { enable = 'always' },
+              expressionAdjustmentHints = { enable = 'always' },
+              lifetimeElisionHints = { enable = 'always', useParameterNames = true },
+              reborrowHints = { enable = 'always' },
+              typeHints = { hideClosureInitialization = true, hideNamedConstructor = true },
+              locationLinks = false,
+            },
+            completion = {
+              completionItem = {
+                commitCharactersSupport = true,
+                deprecatedSupport = true,
+                documentationFormat = { 'markdown', 'plaintext' },
+                preselectSupport = true,
+                snippetSupport = true,
+              },
+            },
+            signatureHelp = {
+              dynamicRegistration = true,
+              signatureInformation = {
+                activeParameterSupport = true,
+                documentationFormat = { 'markdown', 'plaintext' },
+                parameterInformation = {
+                  labelOffsetSupport = true,
+                },
+              },
+            },
+            procMacro = {
+              enable = true,
+              methodReference = true,
+            },
+            lens = {
+              enable = true,
+              methodReferences = true,
+              references = true,
+              implementations = false,
+            },
+          },
+        },
+        -- NOTE: typescript setup in lua/custom/plugins/typescript.lua
+        --
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -686,7 +747,15 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
-
+        omnisharp = {
+          --   enable_editorconfig_support = true,
+          --   enable_ms_build_load_projects_on_demand = false,
+          --   enable_roslyn_analyzers = true,
+          --   organize_imports_on_format = true,
+          --   enable_import_completion = false,
+          --   sdk_include_prereleases = true,
+          --   analyze_open_documents_only = false,
+        },
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
