@@ -1,5 +1,6 @@
+vim.opt.langmap = 'ıi,ğ[,ü],Ğ{,Ü}'
 vim.keymap.set('i', 'jk', '<Esc>')
-vim.keymap.set('n', 'ı', 'i')
+-- vim.keymap.set('n', 'ı', 'i')
 
 vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Nop>')
 
