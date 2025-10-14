@@ -3,6 +3,7 @@ vim.keymap.set('i', 'jk', '<Esc>')
 -- vim.keymap.set('n', 'ı', 'i')
 
 vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Nop>')
+vim.keymap.set({ 'n', 'x', 'o' }, '<c-z>', '<Nop>')
 
 -- Keep things vertically centered during searches
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
