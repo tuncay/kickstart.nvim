@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -413,7 +413,64 @@ require('lazy').setup({
           -- mappings = {
           --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
           --   },
-          file_ignore_patterns = { '%.git/', 'node_modules', '%.cache/' },
+          file_ignore_patterns = {
+            -- Version control
+            '%.git/',
+            '%.svn/',
+            '%.hg/',
+            -- Dependencies
+            'node_modules/',
+            'vendor/',
+            -- Python
+            '__pycache__/',
+            '%.pyc',
+            '%.pyo',
+            '%.pyd',
+            '%.venv/',
+            'venv/',
+            'env/',
+            '%.egg%-info/',
+            'dist/',
+            'build/',
+            '%.pytest_cache/',
+            '%.mypy_cache/',
+            '%.tox/',
+            -- Rust
+            'target/',
+            'Cargo%.lock',
+            -- JavaScript/TypeScript
+            '%.cache/',
+            '%.next/',
+            '%.nuxt/',
+            '%.out/',
+            'out/',
+            'dist/',
+            '%.turbo/',
+            -- Build outputs
+            'build/',
+            'dist/',
+            '%.o',
+            '%.so',
+            '%.dll',
+            '%.exe',
+            -- Minified files
+            '%.min%.js',
+            '%.min%.css',
+            -- IDE
+            '%.vscode/',
+            '%.idea/',
+            '%.vs/',
+            -- OS
+            '%.DS_Store',
+            'Thumbs%.db',
+            -- Logs
+            '%.log',
+            'logs/',
+            -- Lock files
+            'package%-lock%.json',
+            'yarn%.lock',
+            'pnpm%-lock%.yaml',
+          },
         },
         -- pickers = {}
         pickers = {
@@ -659,6 +716,9 @@ require('lazy').setup({
         virtual_text = {
           source = 'if_many',
           spacing = 2,
+          -- Only show ERROR and WARN inline (filter out INFO and HINT)
+          -- INFO and HINT still visible in: gutter signs, Trouble, Telescope diagnostics
+          severity = { min = vim.diagnostic.severity.WARN },
           format = function(diagnostic)
             local diagnostic_message = {
               [vim.diagnostic.severity.ERROR] = diagnostic.message,
@@ -801,6 +861,10 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'prettier', -- JavaScript/TypeScript/JSON/Markdown formatter
+        'prettierd', -- Faster prettier daemon
+        'rustfmt', -- Rust formatter
+        'ruff', -- Python linter and formatter
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -853,11 +917,18 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        python = { 'ruff_format' }, -- Fast, modern Python formatter
+        rust = { 'rustfmt' }, -- Standard Rust formatter
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettier' },
+        jsonc = { 'prettier' },
+        markdown = { 'prettier' },
+        yaml = { 'prettier' },
+        css = { 'prettier' },
+        html = { 'prettier' },
       },
     },
   },
@@ -899,28 +970,21 @@ require('lazy').setup({
     --- @type blink.cmp.Config
     opts = {
       keymap = {
-        -- 'default' (recommended) for mappings similar to built-in completions
-        --   <c-y> to accept ([y]es) the completion.
-        --    This will auto-import if your LSP supports it.
-        --    This will expand snippets if the LSP sent a snippet.
-        -- 'super-tab' for tab to accept
+        -- 'default' for mappings similar to built-in completions (<c-y> to accept)
+        -- 'super-tab' for tab to accept (more intuitive, modern editor style)
         -- 'enter' for enter to accept
         -- 'none' for no mappings
         --
-        -- For an understanding of why the 'default' preset is recommended,
-        -- you will need to read `:help ins-completion`
-        --
-        -- No, but seriously. Please read `:help ins-completion`, it is really good!
-        --
-        -- All presets have the following mappings:
-        -- <tab>/<s-tab>: move to right/left of your snippet expansion
+        -- Using 'super-tab' preset:
+        -- <tab>: Accept completion or move to next snippet placeholder
+        -- <s-tab>: Select previous item or move to previous snippet placeholder
         -- <c-space>: Open menu or open docs if already open
         -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
         -- <c-e>: Hide menu
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'super-tab',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -961,27 +1025,27 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
-    end,
-  },
+  -- { -- You can easily change to a different colorscheme.
+  --   -- Change the name of the colorscheme plugin below, and then
+  --   -- change the command in the config to whatever the name of that colorscheme is.
+  --   --
+  --   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  --   'folke/tokyonight.nvim',
+  --   priority = 1000, -- Make sure to load this before all the other start plugins.
+  --   config = function()
+  --     ---@diagnostic disable-next-line: missing-fields
+  --     require('tokyonight').setup {
+  --       styles = {
+  --         comments = { italic = false }, -- Disable italics in comments
+  --       },
+  --     }
+  --
+  --     -- Load the colorscheme here.
+  --     -- Like many other themes, this one has different styles, and you could load
+  --     -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+  --     vim.cmd.colorscheme 'tokyonight-night'
+  --   end,
+  -- },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },

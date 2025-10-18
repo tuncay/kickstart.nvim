@@ -1,5 +1,8 @@
 local Job = require 'plenary.job'
 
+-- Toggle auto-cd behavior with: :ToggleAutoCd or :lua vim.g.auto_cd_root = false
+vim.g.auto_cd_root = true
+
 local function cdroot_of(opts)
   ---@diagnostic disable-next-line: missing-fields
   Job:new({
@@ -29,12 +32,19 @@ vim.api.nvim_create_user_command('CdRoot', function()
   cdroot_of { cwd = vim.fn.expand '%:p:h' }
 end, { desc = "changes dir to git's root (toplevel)" })
 
+vim.api.nvim_create_user_command('ToggleAutoCd', function()
+  vim.g.auto_cd_root = not vim.g.auto_cd_root
+  local status = vim.g.auto_cd_root and 'enabled' or 'disabled'
+  print('Auto-cd to git root: ' .. status)
+end, { desc = 'toggle auto-cd to git root on buffer enter' })
+
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup('my-cd', { clear = true }),
   pattern = '*',
   callback = function()
     -- Only run for normal buffers, (no terminal, quickfix ...)
-    if vim.bo.buftype == '' then
+    -- Check if auto-cd is enabled
+    if vim.g.auto_cd_root and vim.bo.buftype == '' then
       cdroot_of { cwd = vim.fn.expand '%:p:h' }
     end
   end,
